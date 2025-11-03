@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sceptic"
-version = "0.3.3"
+version = "0.4.0"
 description = "Pseudotime analysis for time-series single-cell sequencing and imaging data"
 authors = [
   { name="Gang Li", email="gangliuw@uw.edu" }
@@ -22,7 +22,11 @@ dependencies = [
   "scikit-learn",
   "xgboost",
   "pandas",
-  "svm"
+  "svm",
+  "scipy",
+  "matplotlib",
+  "seaborn",
+  "packaging"
 ]
 
 [project.urls]

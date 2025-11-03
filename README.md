@@ -3,6 +3,7 @@
 [**Installation**](#installation)
 | [**Enviroment**](#enviroment)
 | [**Example**](#example)
+| [**Advanced Features**](#advanced-features)
 | [**Input**](#input)
 | [**Output**](#output)
 | [**Parameter**](#parameter)
@@ -31,9 +32,105 @@ Sceptic is associated with the following packages.
 We downloaded the processed [scGEM](https://github.com/caokai1073/UnionCom/tree/master/scGEM) dataset from UnionCom’s GitHub page.
 
 ```bash
-$ python test/scGEM/scGEM.py 
+$ python test/scGEM/scGEM.py
 ```
 The script will generate 4 outputs from Sceptic described in the section above and save it at: test/scGEM/.
+
+## Advanced Features <a id="advanced-features"></a>
+
+### Simplified Workflow (NEW!)
+
+Sceptic now automatically handles time label encoding! You can pass actual biological time values directly:
+
+```python
+from sceptic import run_sceptic_and_evaluate
+
+# Option 1: Pass actual time values directly (easiest!)
+time_labels = np.array([0, 0, 8, 8, 16, 16, 24, 24])  # hours
+cm, pred, pseudotime, prob = run_sceptic_and_evaluate(
+    data, time_labels, method="xgboost"
+)
+
+# Option 2: Use encoded labels with time mapping
+encoded_labels = np.array([0, 0, 1, 1, 2, 2, 3, 3])
+actual_timepoints = np.array([0, 8, 16, 24])  # hours
+cm, pred, pseudotime, prob = run_sceptic_and_evaluate(
+    data, encoded_labels, label_list=actual_timepoints, method="xgboost"
+)
+```
+
+**Benefits:**
+- ✅ No manual label encoding required
+- ✅ Pseudotime values in meaningful biological units
+- ✅ More intuitive and less error-prone
+- ✅ Backward compatible with existing code
+
+Sceptic also includes utility modules for comprehensive evaluation and publication-quality visualization!
+
+### Evaluation Utilities
+
+The `sceptic.evaluation` module provides comprehensive metrics for assessing pseudotime predictions:
+
+```python
+from sceptic import evaluation
+
+# Comprehensive evaluation with all metrics
+results = evaluation.evaluate_sceptic_results(
+    confusion_matrix=cm,
+    y_true=label,
+    y_pred=label_predicted,
+    pseudotime=pseudotime,
+    true_time=true_time_values,
+    include_regression=True,  # Optional: include MAE/MSE
+    verbose=True
+)
+```
+
+**Available metrics:**
+- **Classification**: Accuracy, balanced accuracy, per-class precision/recall
+- **Correlation**: Spearman, Pearson, and Kendall correlations
+- **Regression** (optional): MAE, MSE, RMSE
+
+### Plotting Utilities
+
+The `sceptic.plotting` module provides publication-quality visualizations:
+
+```python
+from sceptic import plotting
+
+# Set publication style
+plotting.set_publication_style()
+
+# Create confusion matrix heatmap
+fig = plotting.plot_confusion_matrix(
+    confusion_matrix=cm,
+    label_list=label_list,
+    output_path="confusion_matrix.png",
+    dpi=300
+)
+
+# Create violin plot
+fig = plotting.plot_pseudotime_violin(
+    pseudotime=pseudotime,
+    true_labels=time_labels,
+    output_path="violin_plot.png",
+    dpi=300
+)
+
+# Stratified analysis by groups (e.g., cell types)
+plotting.plot_pseudotime_by_group(
+    pseudotime=pseudotime,
+    true_labels=time_labels,
+    group_labels=cell_types,
+    output_dir="violin_by_cell_type"
+)
+```
+
+### Examples
+
+For detailed tutorials, see the `examples/` directory:
+- **basic_usage.ipynb**: Introduction to Sceptic workflow
+- **custom_evaluation.ipynb**: Advanced evaluation and visualization
 
 ## Parameters of ```Sceptic``` <a id="parameter"></a>
 
