@@ -7,6 +7,7 @@ MIT LICENSE
 ---------------------
 '''
 from sklearn.model_selection import KFold, GridSearchCV
+from tqdm import tqdm
 from sklearn import svm
 import numpy as np
 import sklearn
@@ -165,7 +166,10 @@ def run_sceptic_and_evaluate(data, labels, label_list=None, parameters=None, met
     pseudotime = np.zeros(len(encoded_labels))
     kf = KFold(n_splits=eFold, random_state=23, shuffle=True)
 
-    for i, (train_valid_index, test_index) in enumerate(kf.split(data)):
+    pbar = tqdm(kf.split(data), mininterval=0.5)
+    for i, (train_valid_index, test_index) in enumerate(pbar):
+        pbar.refresh()
+
         X_train, X_test = data[train_valid_index], data[test_index]
         y_train, y_test = encoded_labels[train_valid_index], encoded_labels[test_index]
         #break
